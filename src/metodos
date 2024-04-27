@@ -1,0 +1,66 @@
+ public Optional<Double> sacar(Double valor) {
+        try {
+            Optional.ofNullable(valor).ifPresent(v -> {
+                if (status && saldo >= v) {
+                    saldo -= v;
+                    adicionarExtrato(-v); //teste -v
+                    System.out.println("Saque de R$ " + v + " realizado com sucesso.");
+                } else {
+                    throw new IllegalArgumentException("Saque não realizado");
+                }
+            });
+            Optional<Double> v = Optional.of(Double.valueOf(valor)); return v;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao sacar" + e.getMessage());return Optional.empty();
+        }
+    }
+
+   public Optional<Double> transferirDinheiro(Conta destino, Double valor) {
+        Optional.ofNullable(destino).filter(conta -> status && conta.isStatus() && saldo >= valor)
+                .map(conta -> {
+                    saldo -= valor;
+                    destino.depositar(valor);
+                    adicionarExtrato(-valor);
+                    System.out.println("Transferência de R$ " + valor + " realizada com sucesso");
+                    return valor;
+                }).map(Optional::of)
+                .orElseThrow(() -> new IllegalCallerException("Saldo insuficiente para transferência"));
+    }
+    ------- DEIXEI COMO REFERENCIA DE COMO ESTAVAM ANTES
+    public void depositar(Double valor){
+            this.saldo += valor;
+        }
+        public void transferirDinheiro(Conta destino, Double valor) {
+            if (this.status && destino.isStatus() && this.saldo >= valor){
+                this.saldo -= valor;
+                destino.depositar(valor);
+                System.out.println("Transferência de R$ " + valor + " realizada com sucesso.");
+            }else {
+                System.out.println("Transferência não realizada");
+            }
+
+        }
+
+          @Override
+            public Optional<Double> transferirDinheiro(Conta destino, Double valor){
+                return Optional.ofNullable(destino).filter(conta -> status && conta.isStatus() && saldo >= valor)
+                        .map(conta -> {
+                            saldo -= valor;
+                            destino.depositar(valor);
+                            adicionarExtrato(-valor);
+                            System.out.println("Transferência de R$ " + valor + " realizada com sucesso");
+                            return valor;
+                        }).orElseThrow(() -> new IllegalStateException("Erro ao transferir")).describeConstable();
+                //usei o .describleConstable pois a IDE não aceitou sem, preciso saber porque
+            }
+
+            public Optional<Double> transferirDinheiro(Conta destino, Double valor) {
+                    return Optional.ofNullable(destino).filter(conta -> status && conta.isStatus() && saldo >= valor)
+                            .map(conta -> {
+                                saldo -= valor;
+                                destino.depositar(valor);
+                                adicionarExtrato(-valor);
+                                System.out.println("Transferência de R$ " + valor + " realizada com sucesso");
+                                return valor;
+                            }).orElseThrow(() -> new IllegalStateException("Erro ao transferir")).describeConstable();
+                }
